@@ -22,15 +22,12 @@
 		      :address dummy-provider-address
 		      :reference dummy-provider-reference))
 
-(def dummy-contract {:programming (struct type "Programmering" 980)
-		     :mikado-intro (struct type "Mikado introduktion" 15000)})
 (def dummy-invoice (struct-map invoice
 		     :from dummy-provider
 		     :to dummy-customer
-		     :contract dummy-contract
-		     :items '((struct item :programming "V12" 48)
-			      (struct item :programming "V13" 40)
-			      (struct item :mikado-intro 1))))
+		     :items '((struct item 48 "Programmering V12" 925)
+			      (struct item 40 "Programmering V13" 925)
+			      (struct item 1 "Mikado introduktion" 15000))))
 					
 
 

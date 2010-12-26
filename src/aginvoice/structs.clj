@@ -5,7 +5,9 @@
 (defstruct address :street :number :zip :city)
 (defstruct person :first :last)
 (defstruct invoice :from :to :contract :items)
-(defstruct item :type :spec :count)
-(defstruct type :name :price)
+(defstruct item :count :spec :price)
+				    
+
+
 
 
