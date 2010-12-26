@@ -30,7 +30,7 @@
 		     :contract dummy-contract
 		     :items '((struct item :programming "V12" 48)
 			      (struct item :programming "V13" 40)
-			      (struct iten :mikado-intro 1))))
+			      (struct item :mikado-intro 1))))
 					
 
 
