@@ -4,8 +4,8 @@
 (defstruct company :name :address :reference)
 (defstruct address :street :number :zip :city)
 (defstruct person :first :last)
-(defstruct invoice :from :to :items)
+(defstruct invoice :from :to :contract :items)
 (defstruct item :type :spec :count)
-
+(defstruct type :name :price)
 
 
