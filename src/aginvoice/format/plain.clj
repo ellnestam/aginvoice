@@ -1,2 +1,1 @@
-(ns aginvoice.format)
-
+(ns aginvoice.format.plain)
