@@ -5,11 +5,12 @@
 (unfinished )
 
 (defn example-items [])
-
 (defn example-customer [])
-
-(defn example-provider [])
-
+(defn example-provider-address [] (struct address "Provider street" 12 "12345" "Stockholm"))
+(defn example-provider [] (struct-map company
+			    :name "Some Company"
+			    :address (example-provider-address)
+			    :reference "Some Reference"))
 (defn example-invoice []
   (struct-map invoice
     :from (example-provider)
@@ -29,13 +30,25 @@
         (recur phrase (rest seq))))))
 
 
-(defn has-chunk [expected-lines] (fn [actual] (contains-seq expected-lines (re-seq #"[^\n]+" actual))))
+(defn seq-to-str [s] (String. (into-array (. Character TYPE) s)))
+
+(defn has-chunk [expected-lines] (fn [actual] (contains-seq expected-lines (re-seq #"[^\n]+" (seq-to-str actual)))))
 
 
-(defn plain [inv] (:street (inv :from)))
+(defn plain [inv] (let [from (inv :from) from-addr (from :address)]
+		    (lazy-cat
+		       (from :name) [\newline]
+		       (from :reference) [\newline]
+		       (from-addr :street) " " (str (from-addr :number)) [\newline]
+		       (from-addr :zip) [\newline]
+		       (from-addr :city))))
 
 (fact
- (plain (example-invoice)) => (has-chunk '("street 4711"
-					 "11878"
-					 "Stockholm"))
- (provided (example-provider) => (struct address "street2" 4711 "11878" "Stockholm")))
+ (plain (example-invoice)) => (has-chunk '("The company"
+					   "The reference"
+					   "street 4711"
+					   "11878"
+					   "Stockholm"))
+ (provided (example-provider) => (struct-map company :name "The company"
+						     :address (struct address "street" 4711 "11878" "Stockholm")
+					             :reference "The reference")))
