@@ -5,24 +5,36 @@
   (:use aginvoice.utils)
   (:use aginvoice.checkers))
 
-(unfinished )
+(unfinished plain-separator plain-total plain-total plain-items )
+
+(defn plain-company [c]
+  (let [c-addr (c :address)]
+    (lazy-cat (c :name) [\newline]
+	      (c :reference) [\newline]
+	      (c-addr :street) " " (str (c-addr :number)) [\newline]
+	      (c-addr :zip) [\newline]
+	      (c-addr :city))))
+
 
 (defn plain [inv]
   "formats an invoice as plain text (a lazy sequence of characters)"
-  (let [from (inv :from) from-addr (from :address)]
-		    (lazy-cat
-		       (from :name) [\newline]
-		       (from :reference) [\newline]
-		       (from-addr :street) " " (str (from-addr :number)) [\newline]
-		       (from-addr :zip) [\newline]
-		       (from-addr :city))))
+  (lazy-cat (plain-company (:to inv))
+	  (plain-separator)
+	  (plain-company (:from inv))
+	  (plain-separator)
+	  (plain-items (:items inv))
+	  (plain-separator)
+	  (plain-total (:items inv))))
+
 
 (fact
- (plain (example-invoice)) => (has-chunk '("The company"
-					   "The reference"
-					   "street 4711"
-					   "11878"
-					   "Stockholm"))
- (provided (example-provider) => (struct-map company :name "The company"
-						     :address (struct address "street" 4711 "11878" "Stockholm")
-					             :reference "The reference")))
+ (plain (struct-map invoice
+	  :from ...provider...
+	  :to ...customer...
+	  :items ...items...)) => (seq "Customer/Provider/Items/Sum")
+ (provided
+  (plain-company ...customer...) => "Customer"
+  (plain-company ...provider...) => "Provider"
+  (plain-items ...items...) => "Items"
+  (plain-total ...items...) => "Sum"
+  (plain-separator) => "/"))
