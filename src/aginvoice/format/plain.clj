@@ -5,7 +5,7 @@
   (:use aginvoice.utils)
   (:use aginvoice.checkers))
 
-(unfinished plain-total )
+(unfinished )
 
 
 (defn plain-separator []
@@ -54,6 +54,24 @@
  (plain-items [(struct item 2 "item1" 980)]) => (seq "2\titem1\t980")
  (plain-items [(struct item 40 "programming" 1200)
 	       (struct item 1 "course" 150000)]) => (seq "40\tprogramming\t1200\n1\tcourse\t150000"))
+
+
+(defn plain-total [items]
+  (let [delsumma (reduce #(+ %1 (* (%2 :count) (%2 :price))) 0 items)
+	moms (long (* delsumma 0.25))
+	total (+ delsumma moms)]
+    (concat "delsumma\t" (str delsumma) "\n"
+	    "moms 25%\t"     (str moms) "\n"
+	    "totalt\t"    (str total))))
+
+
+;.;. FAIL at (NO_SOURCE_FILE:1)
+;.;. Expected: (\d \e \l \s \u \m \m \a \tab \2 \1 \0 \0 \0 \newline \m \o \m \s \space \2 \5 \% \tab \5 \2 \5 \0 \newline \t \o \t \a \l \t \tab \2 \6 \2 \5 \0)
+;.;.   Actual: (\d \e \l \s \u \m \m \a \tab \2 \1 \0 \0 \2 \newline \m \o \m \s \space \2 \5 \% \tab \5 \2 \5 \0 \newline \t \o \t \a \l \t \tab \2 \6 \2 \5 \2)
+(facts
+ (plain-total [(struct item 1 "item 1" 1000)]) => (seq "delsumma\t1000\nmoms 25%\t250\ntotalt\t1250")
+ (plain-total [(struct item 1 "item 1" 1000)
+	       (struct item 10 "item 2" 2000)]) => (seq "delsumma\t21000\nmoms 25%\t5250\ntotalt\t26250"))
 
 
 (defn plain [inv]
