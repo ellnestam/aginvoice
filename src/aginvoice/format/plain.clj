@@ -5,9 +5,18 @@
   (:use aginvoice.utils)
   (:use aginvoice.checkers))
 
-(unfinished plain-separator plain-total plain-total plain-items )
+(unfinished plain-total )
+
+
+(defn plain-separator []
+  "returns a lazy character sequence representing an item separator"
+  (seq "\n---------------------------------------\n"))
+
+(fact
+ (plain-separator) => (seq "\n---------------------------------------\n"))
 
 (defn plain-address [c-addr]
+  "returns a lazy character sequence representing an address"
   (lazy-cat (c-addr :street) " " (str (c-addr :number)) [\newline]
 	    (c-addr :zip) [\newline]
 	    (c-addr :city)))
@@ -20,9 +29,10 @@
 		       :city "City")) => (seq "The Street 1\n123456\nCity"))
 
 (defn plain-company [c]
-   (lazy-cat (c :name) [\newline]
-      (c :reference) [\newline]
-      (plain-address (c :address))))
+  "returns a lazy character sequence representing a company"
+  (lazy-cat (c :name) [\newline]
+	    (c :reference) [\newline]
+	    (plain-address (c :address))))
       
 (fact (plain-company
        (struct-map company
@@ -31,6 +41,21 @@
 	 :address ...address...)) => (seq "The Company\nReference\n[address]")
 	 (provided
 	    (plain-address ...address...) => "[address]"))
+
+(defn plain-items [items]
+  (mapcat (fn [i]
+	    (concat (str (i :count))
+		    "\t"
+		    (i :spec)
+		    "\t"
+		    (str (i :price))))
+	  items))
+
+
+(facts
+ (plain-items []) => '()
+ (plain-items [(struct item 2 "item1" 980)]) => (seq "2\titem1\t980"))
+
 
 (defn plain [inv]
   "formats an invoice as plain text (a lazy sequence of characters)"
@@ -41,7 +66,6 @@
 	  (plain-items (:items inv))
 	  (plain-separator)
 	  (plain-total (:items inv))))
-
 
 (fact
  (plain (struct-map invoice
