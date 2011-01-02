@@ -7,14 +7,30 @@
 
 (unfinished plain-separator plain-total plain-total plain-items )
 
-(defn plain-company [c]
-  (let [c-addr (c :address)]
-    (lazy-cat (c :name) [\newline]
-	      (c :reference) [\newline]
-	      (c-addr :street) " " (str (c-addr :number)) [\newline]
-	      (c-addr :zip) [\newline]
-	      (c-addr :city))))
+(defn plain-address [c-addr]
+  (lazy-cat (c-addr :street) " " (str (c-addr :number)) [\newline]
+	    (c-addr :zip) [\newline]
+	    (c-addr :city)))
 
+(fact
+ (plain-address (struct-map address
+		       :street "The Street"
+		       :number 1
+		       :zip "123456"
+		       :city "City")) => (seq "The Street 1\n123456\nCity"))
+
+(defn plain-company [c]
+   (lazy-cat (c :name) [\newline]
+      (c :reference) [\newline]
+      (plain-address (c :address))))
+      
+(fact (plain-company
+       (struct-map company
+	 :reference "Reference"
+	 :name "The Company"
+	 :address ...address...)) => (seq "The Company\nReference\n[address]")
+	 (provided
+	    (plain-address ...address...) => "[address]"))
 
 (defn plain [inv]
   "formats an invoice as plain text (a lazy sequence of characters)"
