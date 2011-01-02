@@ -43,18 +43,17 @@
 	    (plain-address ...address...) => "[address]"))
 
 (defn plain-items [items]
-  (mapcat (fn [i]
-	    (concat (str (i :count))
-		    "\t"
-		    (i :spec)
-		    "\t"
-		    (str (i :price))))
-	  items))
-
+  "creates a lazy sequence of characters representing all items passed"
+  (mapcat (fn [v] v)
+	  (interpose "\n"
+		     (map (fn [i] (concat (str (i :count)) "\t" (i :spec) "\t" (str (i :price))))
+			  items))))
 
 (facts
  (plain-items []) => '()
- (plain-items [(struct item 2 "item1" 980)]) => (seq "2\titem1\t980"))
+ (plain-items [(struct item 2 "item1" 980)]) => (seq "2\titem1\t980")
+ (plain-items [(struct item 40 "programming" 1200)
+	       (struct item 1 "course" 150000)]) => (seq "40\tprogramming\t1200\n1\tcourse\t150000"))
 
 
 (defn plain [inv]
