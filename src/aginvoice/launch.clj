@@ -1,6 +1,7 @@
- (ns aginvoice.launch
-  (:require clojure.contrib.duck-streams))
+(ns aginvoice.launch
+   (:use aginvoice.format.plain)
+   (:use aginvoice.examples))
 
 (defn run-aginvoice [args]
-  (do (println args)))
- 
+  (do (reduce (fn [x, y] (print y)) 0 (plain (example-invoice)))))
+

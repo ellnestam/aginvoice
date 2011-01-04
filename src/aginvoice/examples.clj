@@ -1,7 +1,7 @@
 (ns aginvoice.examples
   (:use aginvoice.structs))
-(defn example-items [] '((struct item 2 "item1" 1200)
-			 (struct item 40 "item2" 800)))
+(defn example-items [] [(struct item 2 "item1" 1200)
+			 (struct item 40 "item2" 800)])
 
 (defn example-customer-address [] (struct address "Customer street" 4611 "76543" "Chicago"))
 (defn example-customer [] (struct-map company

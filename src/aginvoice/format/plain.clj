@@ -1,19 +1,13 @@
 (ns aginvoice.format.plain
-  (:use midje.sweet)
   (:use aginvoice.structs)
   (:use aginvoice.examples)
-  (:use aginvoice.utils)
-  (:use aginvoice.checkers))
-
-(unfinished )
+  (:use aginvoice.utils))
 
 
 (defn plain-separator []
   "returns a lazy character sequence representing an item separator"
   (seq "\n---------------------------------------\n"))
 
-(fact
- (plain-separator) => (seq "\n---------------------------------------\n"))
 
 (defn plain-address [c-addr]
   "returns a lazy character sequence representing an address"
@@ -21,26 +15,13 @@
 	    (c-addr :zip) [\newline]
 	    (c-addr :city)))
 
-(fact
- (plain-address (struct-map address
-		       :street "The Street"
-		       :number 1
-		       :zip "123456"
-		       :city "City")) => (seq "The Street 1\n123456\nCity"))
-
 (defn plain-company [c]
   "returns a lazy character sequence representing a company"
   (lazy-cat (c :name) [\newline]
 	    (c :reference) [\newline]
 	    (plain-address (c :address))))
       
-(fact (plain-company
-       (struct-map company
-	 :reference "Reference"
-	 :name "The Company"
-	 :address ...address...)) => (seq "The Company\nReference\n[address]")
-	 (provided
-	    (plain-address ...address...) => "[address]"))
+
 
 (defn plain-items [items]
   "creates a lazy sequence of characters representing all items passed"
@@ -49,13 +30,6 @@
 		     (map (fn [i] (concat (str (i :count)) "\t" (i :spec) "\t" (str (i :price))))
 			  items))))
 
-(facts
- (plain-items []) => '()
- (plain-items [(struct item 2 "item1" 980)]) => (seq "2\titem1\t980")
- (plain-items [(struct item 40 "programming" 1200)
-	       (struct item 1 "course" 150000)]) => (seq "40\tprogramming\t1200\n1\tcourse\t150000"))
-
-
 (defn plain-total [items]
   (let [delsumma (reduce #(+ %1 (* (%2 :count) (%2 :price))) 0 items)
 	moms (long (* delsumma 0.25))
@@ -63,15 +37,6 @@
     (concat "delsumma\t" (str delsumma) "\n"
 	    "moms 25%\t"     (str moms) "\n"
 	    "totalt\t"    (str total))))
-
-
-;.;. FAIL at (NO_SOURCE_FILE:1)
-;.;. Expected: (\d \e \l \s \u \m \m \a \tab \2 \1 \0 \0 \0 \newline \m \o \m \s \space \2 \5 \% \tab \5 \2 \5 \0 \newline \t \o \t \a \l \t \tab \2 \6 \2 \5 \0)
-;.;.   Actual: (\d \e \l \s \u \m \m \a \tab \2 \1 \0 \0 \2 \newline \m \o \m \s \space \2 \5 \% \tab \5 \2 \5 \0 \newline \t \o \t \a \l \t \tab \2 \6 \2 \5 \2)
-(facts
- (plain-total [(struct item 1 "item 1" 1000)]) => (seq "delsumma\t1000\nmoms 25%\t250\ntotalt\t1250")
- (plain-total [(struct item 1 "item 1" 1000)
-	       (struct item 10 "item 2" 2000)]) => (seq "delsumma\t21000\nmoms 25%\t5250\ntotalt\t26250"))
 
 
 (defn plain [inv]
@@ -83,15 +48,3 @@
 	  (plain-items (:items inv))
 	  (plain-separator)
 	  (plain-total (:items inv))))
-
-(fact
- (plain (struct-map invoice
-	  :from ...provider...
-	  :to ...customer...
-	  :items ...items...)) => (seq "Customer/Provider/Items/Sum")
- (provided
-  (plain-company ...customer...) => "Customer"
-  (plain-company ...provider...) => "Provider"
-  (plain-items ...items...) => "Items"
-  (plain-total ...items...) => "Sum"
-  (plain-separator) => "/"))
