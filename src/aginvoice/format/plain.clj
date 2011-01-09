@@ -1,7 +1,8 @@
 (ns aginvoice.format.plain
   (:use aginvoice.structs)
   (:use aginvoice.examples)
-  (:use aginvoice.utils))
+  (:use aginvoice.utils)
+  (:use midje.sweet))
 
 
 (defn plain-separator []
@@ -48,3 +49,10 @@
 	  (plain-items (:items inv))
 	  (plain-separator)
 	  (plain-total (:items inv))))
+
+(fact
+ (plain-address (struct-map address
+		       :street "The Street"
+		       :number 1
+		       :zip "123456"
+		       :city "City")) => (seq "The Street 1\n123456\nCity"))

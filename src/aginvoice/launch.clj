@@ -3,5 +3,6 @@
    (:use aginvoice.examples))
 
 (defn run-aginvoice [args]
-  (do (reduce (fn [x, y] (print y)) 0 (plain (example-invoice)))))
+  (do (reduce (fn [x y] (print y)) (plain (example-invoice)))))
+
 
