@@ -1,8 +1,10 @@
 (ns aginvoice.launch
-   (:use aginvoice.format.plain)
-   (:use aginvoice.examples))
+  (:use [aginvoice.format.plain]
+	[aginvoice.examples]
+	[aginvoice.io]
+        [clojure.java.io :only (reader copy )]))
 
 (defn run-aginvoice [args]
-  (do (reduce (fn [x y] (print y)) (plain (example-invoice)))))
+   (copy (reader (plain (example-invoice))) *out* ))
 
 

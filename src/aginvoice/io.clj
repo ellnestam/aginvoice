@@ -17,9 +17,6 @@
 		 (aset a (+ off idx) (char c))
 		 (recur (rest s) a off (dec len) (inc idx))))))
 
-;.;. Any intelligent fool can make things bigger, more complex, and more
-;.;. violent. It takes a touch of genius -- and a lot of courage -- to move
-;.;. in the opposite direction. -- Schumacher
 
 (facts "about copy-seq-to-array"
        (let [array (make-array Character/TYPE 10)]
@@ -67,6 +64,14 @@
 	  (String. arr) => "cruel world goodbye"))
 
 (extend StringSeq
+  IOFactory
+  (assoc default-streams-impl
+    :make-reader (fn [x opts] (seq-reader x))))
+(extend ASeq
+  IOFactory
+  (assoc default-streams-impl
+    :make-reader (fn [x opts] (seq-reader x))))
+(extend LazySeq
   IOFactory
   (assoc default-streams-impl
     :make-reader (fn [x opts] (seq-reader x))))
