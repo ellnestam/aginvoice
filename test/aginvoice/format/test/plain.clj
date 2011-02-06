@@ -53,3 +53,10 @@
   (plain-total ...items...) => "Sum"
   (plain-separator) => "/"))
 
+
+(fact
+ (plain-address (struct-map address
+		       :street "The Street"
+		       :number 1
+		       :zip "123456"
+		       :city "City")) => (seq "The Street 1\n123456\nCity"))
