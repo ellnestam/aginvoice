@@ -4,7 +4,19 @@
 	[aginvoice.io]
         [clojure.java.io :only (reader copy )]))
 
+(defn formats [format]
+  (get {:plain plain} format))
+
+(defn source [format invoice]
+  ((formats format) invoice))
+
+(defn target [tgt]
+  (get {:default *out*} tgt))
+
+(defn parse
+  ([args]         (parse args {}))
+  ([args context] (assoc context (keyword (first args)) (keyword (second args)))))
+  
 (defn run-aginvoice [args]
-   (copy (reader (plain (example-invoice))) *out* ))
-
-
+  (let [parsed-args (parse args)]
+    (copy (reader (source (parsed-args :format) (example-invoice))) (target :default))))
